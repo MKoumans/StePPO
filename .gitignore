@@ -1,0 +1,74 @@
+.env
+vdp_gifs/
+checkpoints/
+outputs/*
+runs/*
+data/*
+/figures/
+output/
+paper/outputs/
+*.sif
+old-data/
+.devcontainer/
+datasets/
+
+#Whitelist
+!outputs/latest_unanalysed_results/
+!outputs/latest_unanalysed_results/**
+!outputs/proposed_new_experiments/
+!outputs/proposed_new_experiments/**
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# JAX / XLA Caching
+.jax_cache/
+.xla_cache/
+
+# Pytest and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Python cache / distribution / packaging
+*.egg-info/
+dist/
+build/
+__pycache__/
+
+# Python Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Weights & Biases / Logs
+wandb/
+*.log
+
+# IDEs and Editors (keep .devcontainer to share configuration)
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Scratch files written by tests (see tests/test_ode_pipeline_e2e.py)
+tests/tmp/
+research/ode/diagnostics/output-deeponet
+docs/paper/
+
+# Local model checkpoints (distributed via Hugging Face)
+/models/
+research/baselines/deeponet/output-deeponet/

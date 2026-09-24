@@ -1,0 +1,20 @@
+cc_pulse_enabled: false   # periodic forcing: creates events PID must react to, agent can anticipate
+cc_pulse_period: 10.0     #
+cc_pulse_width: 0.005     # narrow -> abrupt spike, forces a sharp dt shrink/recover
+cc_pulse_amplitude: 10.0  #
+cc_pulse_dim: 0           #
+cc_pulse_random: 0.0      # 0 = fixed period, 1 = fully random pulse spacing (see base_config.py)
+
+fhn_pulse_enabled: false  # periodic injected-current forcing (external stimulus) on top of I_ext
+fhn_pulse_period: 15.0
+fhn_pulse_width: 0.02    # narrow -> abrupt spike, forces a sharp dt shrink/recover
+fhn_pulse_amplitude: 3.0
+fhn_pulse_dim: 0
+fhn_pulse_random: 0.0    # 0 = fixed period, 1 = fully random pulse spacing (see base_config.py)
+
+sd_pulse_enabled: false   # periodic forcing added to the -lambda*y decay
+sd_pulse_period: 0.15    # ~6-7 pulses over the default t_end=1.0 episode
+sd_pulse_width: 0.002    # narrow -> abrupt spike, forces a sharp dt shrink/recover
+sd_pulse_amplitude: 15.0
+sd_pulse_dim: 0
+sd_pulse_random: 0.0     # 0 = fixed period, 1 = fully random pulse spacing (see base_config.py)

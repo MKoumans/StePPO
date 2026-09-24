@@ -1,0 +1,182 @@
+# ICASSP 2027 paper configuration for van_der_pol: the configuration of the released
+# model, Hugging Face MKoumans/vdp (main).
+model_precision: float32
+backbone: varibad
+algo: ppo
+vae:
+  latent_dim: 4
+  latent_dim_long: 0
+  encoder:
+    hidden_size: 64
+    state_embed_dim: 10
+    action_embed_dim: 5
+    reward_embed_dim: 5
+    task_embed_dim: 10
+    activation: tanh
+    normalize: none
+    encoder_type: gru
+    linear_hidden_dims: [64, 64]
+    encoder_inputs: [action, state, reward]
+  decoder:
+    hidden_dims: [128, 64, 32]
+    activation: tanh
+    normalize: none
+  kl_weight: 0.1
+  kl_free_bits: 0.0
+  rew_loss_coeff: 0.45
+  state_loss_coeff: 0.05
+  task_loss_coeff: 0.2
+  accept_loss_coeff: 0.3
+  end_reward_loss_coeff: 0.0
+  lr: 0.001
+  lr_end: 1.0e-05
+  num_updates_per_iter: 2
+  batch_size: 128
+  buffer_capacity_multiplier: 64
+  sequential_kl: true
+  sequential_kl_propagate_gradient: true
+  sequential_kl_anchor_weight: 0.0
+  subsample_len: 0
+  heteroscedastic_recon: true
+  deterministic_latent: false
+ppo:
+  lr: 0.001
+  lr_end: 1.0e-05
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_eps: 0.2
+  entropy_coeff: 0.005
+  value_coeff: 0.5
+  num_epochs: 4
+  num_minibatches: 4
+  target_kl: 0.02
+  policy:
+    hidden_dims: [64, 32]
+    activation: tanh
+    normalize: none
+    policy_inputs: [state, z]
+training:
+  ema_norm: false
+  ema_alpha: 0.99
+  ema_clamp: 5.0
+  ema_input_cap: 10.0
+  grad_clip_vae: 5.0
+  grad_clip_ppo: 0.5
+  kl_anneal_frac: 0.1
+  log_grad_norms: false
+  reward_normalization: {enabled: true, grid_points: 32, num_repeats: 8, max_steps: 0, post_scale_step_penalty: 0.0}
+env:
+  system: van_der_pol
+  precision: float64
+  t_end: 50
+  dt0: 0.001
+  rtol: 0.001
+  atol: 1.0e-06
+  dt_min: 1.0e-06
+  dt_max: 5.0
+  dt_log_gain: 2.5
+  immediate_dt_action: true
+  task_sample_scheme: log-binned
+  train_bins:
+  - [1.0, 100.0]
+  val_bins:
+  - [1.0, 100.0]
+  test_bins:
+  - [1.0, 50.0]
+  mu_min: 1.0
+  mu_max: 100.0
+  sample_mu: true
+  lam_min: 1.0
+  lam_max: 100.0
+  sample_lam: true
+  k2_min: 100000.0
+  k2_max: 1000000000.0
+  sample_k2: true
+  B_min: 2.0
+  B_max: 50.0
+  sample_B: true
+  eps_min: 0.005
+  eps_max: 1.0
+  sample_eps: true
+  cc_lam_min: 0.01
+  cc_lam_max: 10.0
+  sample_cc_lam: true
+  D_min: 1.0
+  D_max: 1.9
+  sample_D: true
+  fosm_w0: 0.1
+  fosm_eps: 0.001
+  m_min: 0.8
+  m_max: 0.8
+  sample_m: false
+  chua_v1_0: 0.15264
+  chua_v2_0: -0.02281
+  chua_i_0: 0.38127
+  chua_eps: 0.001
+  cc_pulse_enabled: false
+  cc_pulse_period: 15.0
+  cc_pulse_width: 0.3
+  cc_pulse_amplitude: 2.0
+  cc_pulse_dim: 0
+  cc_pulse_random: 0.0
+  fhn_pulse_enabled: false
+  fhn_pulse_period: 15.0
+  fhn_pulse_width: 0.3
+  fhn_pulse_amplitude: 1.0
+  fhn_pulse_dim: 0
+  fhn_pulse_random: 0.0
+  sd_pulse_enabled: false
+  sd_pulse_period: 0.15
+  sd_pulse_width: 0.02
+  sd_pulse_amplitude: 5.0
+  sd_pulse_dim: 0
+  sd_pulse_random: 0.0
+  sample_y0: false
+  y0_x: 0.0
+  y0_y: -2.0
+  obs_features: [state, step_context]
+  reward_factor: 50.0
+  progress_warp: false
+  completion_bonus: 25.0
+  survival_penalty: 0.0
+  rejection_penalty: 0.0
+  margin_penalty: 0.0
+warmstart: {enabled: false, expert: oracle, num_iters: 100, bc_lr: 0.001, bc_epochs: 2, pid_safety: 0.9,
+  pid_order: 4, pid_min_factor: 0.25, pid_max_factor: 4.0, pid_kp: 0.0, pid_ki: 1.0, pid_kd: 0.0, oracle_max_iters: 6,
+  oracle_dataset_seed: 0}
+precompute_baseline:
+  enabled: true
+  eval_mus: [1, 5, 10, 20, 50, 100, 200]
+  num_repeats: 16
+  max_steps: 0
+eval_metrics: {enabled: true, num_envs: 256, max_steps: 0, interval: 100}
+latent_scatter:
+  enabled: true
+  num_samples: 300
+  dims: [0, 1]
+  max_steps: 0
+  gif_fps: 4
+  interval: 25
+pid_fallback: {enabled: false, interval: 100, num_envs: 128, start_frac: 0.8, ema_alpha: 0.99, max_steps: 0,
+  track_reject_streak: true, reject_streak_percentile: 99.0, reject_streak_multiplier: 1.5, track_accept_ema: true,
+  accept_ema_percentile: 1.0, accept_ema_multiplier: 1.5, track_log_error_ema: false, log_error_ema_percentile: 99.0,
+  log_error_ema_multiplier: 1.5}
+episodes_per_trial: 1
+episode_max_steps: 0
+reset_belief_between_episodes: false
+total_iters: 1000
+num_envs: 256
+rollout_steps: 750
+eval_max_steps: 750
+seed: 0
+use_wandb: false
+eval_interval: 25
+num_eval_episodes: 128
+log_interval: 25
+save_plots: true
+save_json: true
+exp_name: van_der_pol_icassp2027
+note: ''
+env_family: ode
+runs_dir: outputs/runs
+extensive_timing_logging: false

@@ -1,0 +1,9 @@
+# Single-sample CPU wallclock sweep, PID only (no RL checkpoint) —
+# useful as a fast baseline reading directly off an env config.
+env_config: configs/envs/ode/van_der_pol/van_der_pol_default.yaml
+mode: single
+device: cpu
+skip_pid: false
+n_sweep: 30
+repeats: 20
+max_steps: 8192

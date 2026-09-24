@@ -1,0 +1,20 @@
+model_precision: float32   # float32 | float16 | bfloat16 — neural network dtype
+latent_dim: 4
+
+encoder:
+  hidden_size: 32
+  state_embed_dim: 8
+  action_embed_dim: 4
+  reward_embed_dim: 4
+  activation: tanh
+  normalize: none
+
+decoder:
+  hidden_dims: [32, 32]
+  activation: tanh
+  normalize: none
+
+policy:
+  hidden_dims: [64, 32, 32]
+  activation: tanh
+  normalize: none

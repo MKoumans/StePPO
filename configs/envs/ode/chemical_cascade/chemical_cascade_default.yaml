@@ -1,0 +1,40 @@
+# Chemical cascade — 10 layers x 5 chemicals (50 states), block-tridiagonal
+# reaction-diffusion system. Hidden task: lambda (uniform decay rate),
+# sampled log-uniformly from [cc_lam_min, cc_lam_max]. Stiffness comes from
+# the widely-separated within-layer reaction rates plus lambda; the
+# diffusive coupling between layers produces a layer-1 -> layer-10 delay.
+extends: ode_default
+model: vae_vdp_linear
+
+exp_name: "chemical_cascade_default"
+
+rollout_steps: 250
+eval_max_steps: 250
+
+warmstart:
+  enabled: false
+  num_iters: 100
+
+env:
+  system: chemical_cascade
+  precision: float64
+  t_end: 50
+  dt0: 1.0e-4
+  rtol: 1.0e-4
+  atol: 1.0e-6
+  dt_min: 1.0e-6
+  dt_max: 1.0e+3
+  dt_log_gain: 2.5 # exp(2.5) = 12.1825x step size change per action unit
+  immediate_dt_action: true  #
+  progress_warp: true
+  cc_lam_min: 0.01
+  cc_lam_max: 10.0
+  sample_cc_lam: true
+  pulse_config: pulse_config # either name of config.yaml, or empty for no pulses
+  sample_y0: false        #
+  # survival_penalty: 0.25  #
+  obs_features: [state, step_context] # see experiment: outputs/experiments/20260824/57cde7c4
+  task_sample_scheme: "log-binned"
+  train_bins: [[0.01, 10.0]]  # full range for now
+  val_bins: [[0.01, 10.0]]    # swept periodically during training (eval_metrics)
+  test_bins: [[0.01, 10.0]]   # swept periodically during training and by post-hoc analysis scripts

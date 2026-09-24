@@ -1,0 +1,6 @@
+# The images copy only the dependency manifests (the repository is bind-mounted
+# at /workspace), so send nothing else: local data, venvs and checkouts can be
+# several GB, which is slow to transfer into the Docker Desktop/Podman VM.
+*
+!pyproject.toml
+!uv.lock

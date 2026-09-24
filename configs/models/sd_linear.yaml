@@ -1,0 +1,25 @@
+# VAE + Policy architecture for scalar decay, memoryless encoder ablation.
+# Identical to sd_1.yaml except encoder.encoder_type: linear — the GRU is
+# replaced by plain linear layers with no recurrence, so mu/logvar depend only
+# on the current (state, action, reward) step, never past ones.
+model_precision: float32   # float32 | float16 | bfloat16 — neural network dtype
+latent_dim: 4
+
+encoder:
+  encoder_type: linear         # gru | linear
+  linear_hidden_dims: [32, 32] # per-step MLP depth (replaces GRU recurrence)
+  state_embed_dim: 8
+  action_embed_dim: 4
+  reward_embed_dim: 4
+  activation: tanh
+  normalize: none
+
+decoder:
+  hidden_dims: [32, 32]
+  activation: tanh
+  normalize: none
+
+policy:
+  hidden_dims: [64, 32, 32]
+  activation: tanh
+  normalize: none

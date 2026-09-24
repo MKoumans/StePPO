@@ -1,0 +1,66 @@
+seed: 0
+episodes_per_trial: 1
+num_envs: 256
+num_eval_episodes: 128
+total_iters: 1000
+log_interval: 25
+eval_interval: 50
+latent_scatter.interval: 100
+
+# total_iters: 10
+# log_interval: 5
+# eval_interval: 5
+# latent_scatter.interval: 5
+
+vae:
+  lr: 0.001
+  lr_end: 1.0e-5
+  task_loss_coeff: 0.2        #
+  accept_loss_coeff: 0.3      #
+  state_loss_coeff: 0.05      # predict next state from z
+  rew_loss_coeff: 0.45        # predict reward from z
+  end_reward_loss_coeff: 0.0  # predict end-of-episode reward from z; in principle included inside rew_loss_coeff
+  kl_weight: 0.10             # KL regularisation on z
+  kl_free_bits: 0.0           # per-dim KL floor in nats (anti-posterior-collapse); 0 = off
+  num_updates_per_iter: 2
+  batch_size: 128
+  subsample_len: 0  # loss window per trajectory (0 = full; encoder always sees all steps)
+  buffer_capacity_multiplier: 64          # buffer = batch_size * this (64 → ~64 iters to full turnover)
+  sequential_kl: true                     #
+  heteroscedastic_recon: true             # Include per-step variance prediction in the VAE decoder (heteroscedastic likelihood)
+  sequential_kl_propagate_gradient: true  #
+
+ppo:
+  entropy_coeff: 0.005  #
+  lr: 0.001             #
+  lr_end: 1.0e-5        #
+  gamma: 0.99           #
+  gae_lambda: 0.95      #
+  clip_eps: 0.2         #
+  value_coeff: 0.5      #
+  num_epochs: 4         #
+  num_minibatches: 4    #
+  target_kl: 0.02       #
+
+
+training:
+  ema_norm: false       #
+  grad_clip_vae: 5.0    #
+  grad_clip_ppo: 0.5    #
+  kl_anneal_frac: 0.10  # linearly ramp kl_weight over first 10% of VAE gradient steps
+  log_grad_norms: false # used for logging the grad norms
+  reward_normalization:
+    enabled: true   #
+    grid_points: 32 #
+    num_repeats: 8  #
+    max_steps: 0    # PID budget per grid point; 0 = rollout_steps (censored points extrapolated to full-episode cost)
+
+warmstart:
+  enabled: false        #
+  expert: oracle        # pid|oracle
+  bc_lr: 0.001          #
+  bc_epochs: 2          #
+  pid_safety: 0.9       #
+  pid_order: 4          #
+  pid_min_factor: 0.25  #
+  pid_max_factor: 4.0   #

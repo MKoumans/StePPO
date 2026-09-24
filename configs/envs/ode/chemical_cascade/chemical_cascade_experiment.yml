@@ -1,0 +1,22 @@
+# ppo.lr: 3.0e-4, 7.0e-4, 1.5e-3
+# ppo.entropy_coeff: 0.005, 0.01, 0.02
+
+# env.immediate_dt_action: false, true
+# env.dt_log_gain: 2.5, 3.0
+# env.survival_penalty: 0.00, 0.05, 0.25
+# env.progress_warp: false, true
+
+# env.cc_pulse_enabled,env.cc_pulse_random:
+#   - [false, 0.0]
+#   - [true, 0.0]
+#   - [true, 0.25]
+#   - [true, 0.5]
+#   - [true, 1.0]
+
+# ppo.entropy_coeff: 0.0001, 0.001, 0.0025, 0.005
+
+vae.deterministic_latent, model:
+  - [false, vae_vdp_1]      #
+  - [false, vae_vdp_4]      #
+  - [true, vae_vdp_1]       #
+  - [true, vae_vdp_linear]  #

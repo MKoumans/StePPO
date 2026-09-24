@@ -1,0 +1,30 @@
+# model_sweep.py run for van_der_pol: PID / PID(oracle) / PID(tuned), plus
+# RL(StePPO) whenever --checkpoint_steppo <path> is passed on the CLI (or set
+# here). Coefficients for "PID (tuned)" are the Kp/Ki/Kd found by
+# research/pid_tuning/pi_bayes_opt.py's unconstrained (no p95-error bound) BO
+# sweep against the van_der_pol_default train/val/test caches — a clean win
+# over the baseline on both steps (~30% fewer) and accuracy (p95_error
+# -4.54 vs -3.19) on the test split, unlike scalar_decay's steps/accuracy
+# tradeoff.
+env_config: configs/envs/ode/van_der_pol/van_der_pol_default.yaml
+n_sweep: 30
+num_repeats: 8
+max_steps: 8192
+wallclock_repeats: 20
+wallclock_batch_size: 16
+device: gpu
+
+# Set checkpoint_steppo (or pass --checkpoint_steppo <path>) to add "RL (StePPO)".
+# checkpoint_steppo: outputs/runs/<date>/ode/van_der_pol/<run_uid>/checkpoints/checkpoint_<N>
+
+models:
+  - type: pid
+    label: "PID"
+  - type: pid_oracle
+    label: "PID (oracle)"
+    max_iters: 6
+  - type: pid_tuned
+    label: "PID (tuned)"
+    kp: 2.862153227570565
+    ki: 0.05477163894635173
+    kd: 0.3990678001505823

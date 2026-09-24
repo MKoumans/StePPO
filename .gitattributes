@@ -1,0 +1,7 @@
+# Normalize all text files to LF line endings on checkout/commit,
+# regardless of the committer's OS or local core.autocrlf setting.
+* text=auto eol=lf
+
+# cmd.exe mis-parses labels in LF batch files.
+*.cmd text eol=crlf
+*.bat text eol=crlf

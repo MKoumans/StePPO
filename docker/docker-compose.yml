@@ -1,0 +1,34 @@
+name: steppo
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    volumes:
+      - ..:/workspace
+      - steppo_cache:/root/.cache/steppo
+    working_dir: /workspace
+    ports:
+      - "8888:8888"   # Jupyter (see docs/installation.md)
+    user: root
+    stdin_open: true
+    tty: true
+    shm_size: 4gb
+    environment:
+      - TZ=Europe/Amsterdam
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    security_opt:
+      - seccomp=unconfined
+
+volumes:
+  steppo_cache:

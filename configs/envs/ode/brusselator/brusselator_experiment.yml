@@ -1,0 +1,30 @@
+# model, env.train_bins, env.val_bins, env.test_bins, env.obs_features:
+#   - [vae_vdp_linear, [[1.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context]]
+#   - [vae_vdp_linear, [[10.0, 20.0], [40.0, 50.0], [70.0, 80.0]], [[10.0, 20.0], [40.0, 50.0]], [[1.0, 100.0]], [state, step_context]]
+#   - [vae_vdp_linear, [[1.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]
+#   - [vae_vdp_linear, [[10.0, 20.0], [40.0, 50.0], [70.0, 80.0]], [[10.0, 20.0], [40.0, 50.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]
+# total_iters: 1000
+
+# model: vae_vdp_linear, vae_vdp_1
+# env.progress_warp: true, false
+# warmstart.enabled: true, false
+# model, env.obs_features:
+#   - [empty_vdp, [state, step_context, solver_trend]]
+#   - [vae_vdp_linear, [state, step_context, solver_trend]]
+#   - [vae_vdp_linear, [state, step_context]]
+#   - [empty_vdp, [state, step_context]]
+
+total_iters: 750
+
+# Final 3-model x 2-training-regime comparison.
+# Full rows train on the complete interval; binned rows train on separated
+# intervals and are evaluated on the same full validation/test range.
+# model, env.train_bins, env.val_bins, env.test_bins, env.obs_features:
+#   - [empty_vdp, [[1.0, 50.0]], [[1.0, 50.0]], [[1.0, 50.0]], [state, step_context, solver_trend]]
+#   - [empty_vdp, [[1.0, 10.0], [20.0, 35.0], [45.0, 50.0]], [[1.0, 50.0]], [[1.0, 50.0]], [state, step_context, solver_trend]]
+#   - [vae_vdp_linear, [[1.0, 50.0]], [[1.0, 50.0]], [[1.0, 50.0]], [state, step_context, solver_trend]]
+#   - [vae_vdp_linear, [[1.0, 10.0], [20.0, 35.0], [45.0, 50.0]], [[1.0, 50.0]], [[1.0, 50.0]], [state, step_context, solver_trend]]
+#   - [vae_vdp_3, [[1.0, 50.0]], [[1.0, 50.0]], [[1.0, 50.0]], [state, step_context, solver_trend]]
+#   - [vae_vdp_3, [[1.0, 10.0], [20.0, 35.0], [45.0, 50.0]], [[1.0, 50.0]], [[1.0, 50.0]], [state, step_context, solver_trend]]
+
+env.task_sample_scheme: ["binned", "log-binned"]

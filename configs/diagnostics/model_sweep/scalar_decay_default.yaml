@@ -1,0 +1,26 @@
+# model_sweep.py run for scalar_decay: PID / PID(oracle) / PID(tuned), plus
+# RL(StePPO) whenever --checkpoint_steppo <path> is passed on the CLI (or set
+# here). Coefficients for "PID (tuned)" are the Kp/Ki/Kd found by
+# research/pid_tuning/pi_bayes_opt.py's unconstrained (no p95-error bound) BO
+# sweep against the scalar_decay_default train/val/test caches.
+env_config: configs/envs/ode/scalar_decay/scalar_decay_default.yaml
+n_sweep: 30
+num_repeats: 8
+max_steps: 8192
+wallclock_repeats: 20
+wallclock_batch_size: 16
+device: gpu
+
+# checkpoint_steppo: outputs/runs/<date>/ode/scalar_decay/<run_uid>/checkpoints/checkpoint_500
+
+models:
+  - type: pid
+    label: "PID"
+  - type: pid_oracle
+    label: "PID (oracle)"
+    max_iters: 6
+  - type: pid_tuned
+    label: "PID (tuned)"
+    kp: 0.0601995
+    ki: 1.9007342
+    kd: 0.0210876

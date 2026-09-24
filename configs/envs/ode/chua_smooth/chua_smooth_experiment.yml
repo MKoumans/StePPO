@@ -1,0 +1,2 @@
+warmstart.enabled: false, true
+model: empty_vdp, vae_vdp_linear

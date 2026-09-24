@@ -1,0 +1,69 @@
+# Chua-inspired circuit (Riley et al. 2025 Case 2, arXiv:2501.08934):
+#   V1_dot = -V1/(C1*R) + V2/(C1*R) - (m/C1)*sign(V1)
+#   V2_dot =  V1/(C2*R) - V2/(C2*R) + i/C2
+#   i_dot  = -V2/L
+# sign(V1) regularized to tanh(V1/eps) (see env.chua_eps and
+# src/steppo/envs/ode/systems/chua.py -- same chattering issue as FOSM's raw
+# sign() expected/observed for the raw "chua" system; "chua_smooth" at
+# eps=1e-3 converges in ~123 total steps for the full 20s horizon at the
+# training IC, no tuning needed).
+#
+# Same as chua_smooth_single_task.yaml (a single fixed task, m=0.8 -- the
+# paper's diode-gain value; C1,C2,R,L fixed in chua.py -- at the paper's
+# training IC (V1,V2,i)=(0.15264,-0.02281,0.38127)), just named *_default.yaml
+# so scripts/run-all-ode.sh's configs/envs/ode/<system>/<system>_default.yaml
+# convention picks it up for "chua_smooth". The paper's held-out eval IC
+# (V1,V2,i)=(9.998048,1.980972,-10.908448) is NOT covered by this config --
+# ODEEnv's task-distribution axis is m, not y0, so that generalization test
+# needs a separate inference-time script, not a training config change.
+extends: ode_default
+model: empty_vdp # vae_vdp_3 # empty_vdp
+
+exp_name: "chua_smooth_experiment"
+seed: 0
+total_iters: 1000
+episodes_per_trial: 1
+num_envs: 32
+num_eval_episodes: 32
+rollout_steps: 200
+eval_max_steps: 200
+eval_interval: 50
+log_interval: 20
+
+precompute_baseline:
+  eval_mus: [0.5, 0.8, 1.0, 1.5, 2.0]
+
+ppo:
+  entropy_coeff: 0.010  #
+
+warmstart:
+  enabled: false    #
+
+training.reward_normalization: false
+
+env:
+  system: chua_smooth
+  precision: float64
+  t_end: 20.0
+  rtol: 1.0e-3
+  atol: 1.0e-6
+  dt0: 1.0e-5
+  dt_min: 1.0e-10
+  dt_max: 2.0       # t_end/10 -- Riley et al. Case 2 dt bound ("h_max chosen to require at least 10 steps")
+  dt_log_gain: 2.5  # dt_next = clip(dt * exp(action * dt_log_gain), dt_min, dt_max)
+  immediate_dt_action: true
+  progress_warp: false
+  survival_penalty: 0.0
+  margin_penalty: 0.0
+  m_min: 0.8 # 0.1
+  m_max: 0.8 # 2
+  sample_m: false        # fixed single task -- see header
+  chua_v1_0: 0.15264
+  chua_v2_0: -0.02281
+  chua_i_0: 0.38127
+  chua_eps: 0.01         # tanh(V1/eps) boundary-layer width -- see header
+  obs_features: [state, step_context]
+  task_sample_scheme: "binned"
+  train_bins: [[0.8, 0.8]] # [[0.5, 2.0]]
+  val_bins: [[0.8, 0.8]] # [[0.5, 2.0]]
+  test_bins: [[0.8, 0.8]] # [[0.5, 2.0]]

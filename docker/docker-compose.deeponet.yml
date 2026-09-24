@@ -1,0 +1,22 @@
+name: steppo_deeponet
+
+services:
+  deeponet:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.deeponet-gpu
+    volumes:
+      - ..:/workspace
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    shm_size: 4gb
+    environment:
+      DDE_BACKEND: pytorch
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

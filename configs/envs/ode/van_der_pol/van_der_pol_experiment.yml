@@ -1,0 +1,122 @@
+# model: vae_vdp_1, vae_vdp_2
+# warmstart.enabled: true, false
+# vae.sequential_kl: true, false
+# model.latent_dim: 1,2,4,8,16,32
+# vae.kl_free_bits: 0.0, 0.1, 0.2, 0.5
+# vae.task_loss_coeff: 0.0, 0.25
+# training.reward_normalization.enabled: true, false
+# vae.subsample_len: 0, 500, 1000
+# model: vae_vdp_1
+# vae.end_reward_loss_coeff: 0.0, 0.1, 0.2, 0.5
+
+# rollout_steps: 750, 1500
+# env.progress_warp: true, false
+# env.t_end: 50, 100, 200
+
+# model: vae_vdp_1, vae_vdp_3, vae_vdp_4 # Validate decoder sizes against posterior collaps
+# vae.kl_weight: 0.01, 0.1, 1.0
+# vae.kl_free_bits: 0.0, 0.25, 0.5
+
+# vae.heteroscedastic_recon: false, true
+# training.ema_norm: false,true
+
+# vae.kl_weight: 0.01, 0.1, 1.0
+# vae.kl_free_bits: 0.0, 0.25, 0.5
+
+# total_iters: 500
+# vae.heteroscedastic_recon: false, true
+
+# vae.sequential_kl: false, true
+
+# vae.heteroscedastic_recon: false, true
+# vae.sequential_kl_anchor_weight: 0.00, 0.05, 0.10
+
+# total_iters: 500
+# vae.heteroscedastic_recon: false, true            #
+# vae.sequential_kl_propagate_gradient: false, true #
+# vae.sequential_kl: false, true
+
+# vae.deterministic_latent: false, true
+
+# model: vae_vdp_1, vae_vdp_linear
+
+# entropy_coeff: 0.0001, 0.001, 0.0025, 0.005
+
+# vae.deterministic_latent, model:
+#   - [false, vae_vdp_1]      #
+#   # - [false, vae_vdp_4]      #
+#   - [true, vae_vdp_1]       #
+#   # - [true, vae_vdp_linear]  #
+
+# env.task_sample_scheme, env.train_bins, env.test_bins:
+#   - [binned, [[5.0, 100.0]], [[1.0, 100.0]]]
+#   # - [log-uniform, []]
+#   - [binned, [[5.0, 10.0], [20.0, 35.0], [60.0, 100.0]], [[1.0, 100.0]]]
+#   # - [log-binned, [[5.0, 10.0], [20.0, 35.0], [60.0, 100.0]]]
+
+# total_iters: 5
+
+# vae.deterministic_latent, model:
+# # vae.deterministic_latent: false, true
+# # model: vae_vdp_1, vae_vdp_linear
+#   - [false, vae_vdp_1]      # Variational latent
+#   - [true, vae_vdp_1]       # Deterministic latent
+#   - [true, empty_vdp]       # No latent
+#   - [true, vae_vdp_linear]  # Memoryless encoder
+
+# env.margin_penalty: 0.25, 0.5, 1.0
+
+# total_iters: 250
+# env.obs_features:
+#   - [step_context]
+#   - [state, step_context]
+#   - [step_context, solver_trend]
+#   - [step_context, direction]
+#   - [state, step_context, solver_trend]
+#   - [state, step_context, direction]
+#   - [step_context, solver_trend, direction]
+#   - [state, step_context, solver_trend, direction]
+
+# env.progress_warp, training.reward_normalization.enabled, vae.task_loss_coeff:
+#   - [false, false, 0.0]   # No normalisation at all
+#   - [false, true, 0.0]    # Only normalise according to reward grid
+#   - [true, false, 0.0]    # Use warping (warped=true, no normalisation by default)
+#   - [false, false, 0.2]   # Only task loss
+#   - [false, true, 0.2]    # Use reward grid and task loss
+#   - [true, false, 0.2]    # Use warping and task loss
+
+# vae.deterministic_latent: false
+# model, env.obs_features:
+#   - [vae_vdp_1, [state, step_context]]
+#   - [empty_vdp, [state, step_context]]
+
+# env.rtol: 1.0e-3, 1.0e-4, 1.0e-5, 1.0e-6
+
+# total_iters: 20
+# log_interval: 10
+# eval_interval: 5
+# latent_scatter.interval: 10
+
+# model, env.train_bins, env.val_bins, env.test_bins, env.obs_features:
+#   - [empty_vdp, [[5.0,9.0], [13.0,17.0], [17.0,21.0]], [[5.0,9.0], [13.0,17.0]], [[1.0, 25.0]], [state, step_context]]
+#   - [empty_vdp, [[5.0,9.0], [13.0,17.0], [17.0,21.0]], [[5.0,9.0], [13.0,17.0]], [[1.0, 25.0]], [state, step_context, solver_trend]]
+#   - [vae_vdp_linear, [[5.0,9.0], [13.0,17.0], [17.0,21.0]], [[5.0,9.0], [13.0,17.0]], [[1.0, 25.0]], [state, step_context]]
+#   - [vae_vdp_linear, [[5.0,9.0], [13.0,17.0], [17.0,21.0]], [[5.0,9.0], [13.0,17.0]], [[1.0, 25.0]], [state, step_context, solver_trend]]
+#   - [vae_vdp_1, [[5.0,9.0], [13.0,17.0], [17.0,21.0]], [[5.0,9.0], [13.0,17.0]], [[1.0, 25.0]], [state, step_context]]
+#   - [vae_vdp_1, [[5.0,9.0], [13.0,17.0], [17.0,21.0]], [[5.0,9.0], [13.0,17.0]], [[1.0, 25.0]], [state, step_context, solver_trend]]
+
+# env.rtol, env.atol, rollout_steps:
+#   - [1.0e-3, 1.0e-6, 750]
+#   - [1.0e-4, 1.0e-7, 1000]
+#   - [1.0e-5, 1.0e-8, 1250]
+
+# Final 3-model x 2-training-regime comparison.
+# Full rows train on the complete interval; binned rows train on separated
+# intervals and are evaluated on the same full validation/test range.
+model, env.train_bins, env.val_bins, env.test_bins, env.obs_features:
+  - [empty_vdp, [[1.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]
+  - [empty_vdp, [[5.0, 10.0], [20.0, 35.0], [60.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]
+  - [vae_vdp_linear, [[1.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]
+  - [vae_vdp_linear, [[5.0, 10.0], [20.0, 35.0], [60.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]
+  - [vae_vdp_3, [[1.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]
+  - [vae_vdp_3, [[5.0, 10.0], [20.0, 35.0], [60.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]

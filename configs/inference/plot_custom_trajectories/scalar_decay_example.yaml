@@ -1,0 +1,8 @@
+# Task-only conditions (scalar_decay's y0 is hard-fixed, no y0 override possible).
+checkpoint: outputs/runs/20260824/ode/scalar_decay/2c2e5872/checkpoints/checkpoint_500
+conditions:
+  - [1]
+  - [50]
+  - [100]
+step_interval: 5
+show_rejected: true

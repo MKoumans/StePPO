@@ -1,0 +1,38 @@
+# env.sd_pulse_enabled,env.sd_pulse_random:
+#   - [false, 0.0]
+#   - [true, 0.0]
+#   - [true, 0.25]
+#   - [true, 0.5]
+#   - [true, 1.0]
+
+# warmstart.enabled, expert:
+#   - [false, oracle]
+#   - [true, pid]
+#   - [true, oracle]
+
+# env.progress_warp: true, false            #
+# training.reward_normalization.enabled: true, false #
+
+# vae.deterministic_latent, model:
+#   - [false, sd_1]        #
+#   - [true, sd_1]         #
+#   - [true, sd_linear]    #
+
+# total_iters: 300
+# env.survival_penalty: 0.0, 0.1, 0.25, 0.5, 1.0, 2.0
+
+# total_iters: 20
+# log_interval: 10
+# eval_interval: 5
+# latent_scatter.interval: 10
+
+# Final 3-model x 2-training-regime comparison.
+# Full rows train on the complete interval; binned rows train on separated
+# intervals and are evaluated on the same full validation/test range.
+model, env.train_bins, env.val_bins, env.test_bins, env.obs_features:
+  - [empty_vdp, [[1.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]
+  - [empty_vdp, [[1.0, 10.0], [40.0, 60.0], [90.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]
+  - [vae_vdp_linear, [[1.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]
+  - [vae_vdp_linear, [[1.0, 10.0], [40.0, 60.0], [90.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]
+  - [vae_vdp_3, [[1.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]
+  - [vae_vdp_3, [[1.0, 10.0], [40.0, 60.0], [90.0, 100.0]], [[1.0, 100.0]], [[1.0, 100.0]], [state, step_context, solver_trend]]

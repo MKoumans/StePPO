@@ -1,0 +1,10 @@
+# Batched-mode wallclock sweep for a Van der Pol checkpoint.
+# Fill in `checkpoint` with a real checkpoint_N path before running:
+#   uv run python research/ode/diagnostics/wallclock_vs_mu.py \
+#       --config configs/diagnostics/wallclock_vs_mu/van_der_pol_batched.yaml
+checkpoint: outputs/runs/<date>/ode/van_der_pol/<run_uid>/checkpoints/checkpoint_500
+mode: batched
+device: gpu
+n_sweep: 30
+repeats: 20
+max_steps: 8192

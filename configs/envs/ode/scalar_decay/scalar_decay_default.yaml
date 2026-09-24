@@ -1,0 +1,37 @@
+# ODE: dy/dt = -y, exact solution y(t) = exp(-t) on [0, 1]
+extends: ode_default
+# model: sd_linear
+model: vae_vdp_3
+
+exp_name: "scalar_decay_default"
+seed: 0
+total_iters: 750
+episodes_per_trial: 1
+num_envs: 256
+num_eval_episodes: 128
+rollout_steps: 40
+eval_interval: 50
+log_interval: 10
+
+env:
+  system: scalar_decay
+  precision: float64      # match van_der_pol/brusselator; step counts are not comparable across precisions
+  t_end: 10.0
+  dt0: 0.1
+  rtol: 1.0e-3 # 1.0e-5
+  atol: 1.0e-6 # 1.0e-8
+  dt_min: 1.0e-5
+  dt_max: 10.0
+  dt_log_gain: 2.5        # dt_next = clip(dt * exp(action * dt_log_gain), dt_min, dt_max), action in [-1,1] -> max exp(2.5) ~= 12.2x per step
+  progress_warp: false # false
+  immediate_dt_action: true
+  survival_penalty: 0.0
+  margin_penalty: 0.0
+  pulse_config: pulse_config
+  lam_min: 1.0
+  lam_max: 100.0
+  task_sample_scheme: "log-binned"
+  obs_features: [state, step_context] # see experiment: outputs/experiments/20260824/57cde7c4
+  train_bins: [[15.0, 25.0], [45.0,55.0], [75.0, 85.0]] # [[1.0, 100.0]]  # full range for now
+  val_bins: [[1.0, 100.0]]    # swept periodically during training (eval_metrics)
+  test_bins: [[1.0, 100.0]]   # swept periodically during training and by post-hoc analysis scripts

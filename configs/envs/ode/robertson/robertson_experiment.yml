@@ -1,0 +1,13 @@
+# env.progress_warp: false, true
+
+# vae_vdp_1 vs empty_vdp, same belief-vs-no-belief ablation as the
+# van_der_pol e1/e2 experiment (obs_features stripped down to
+# [state, step_context], dropping solver_trend's EMA-like features
+# so the comparison isolates the GRU belief on its own). Robertson's
+# stiffness transition is far more delayed/multi-timescale than VDP's,
+# so this is the harder test of whether the belief earns its keep.
+
+vae.deterministic_latent: false
+model, env.obs_features:
+  - [vae_vdp_1, [state, step_context]]
+  - [empty_vdp, [state, step_context]]

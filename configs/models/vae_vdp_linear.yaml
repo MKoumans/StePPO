@@ -1,0 +1,25 @@
+# VAE + Policy architecture for Van der Pol oscillator, memoryless encoder ablation.
+# Identical to vae_vdp_1.yaml except encoder.encoder_type: linear — the GRU is
+# replaced by plain linear layers with no recurrence, so mu/logvar depend only
+# on the current (state, action, reward) step, never past ones.
+model_precision: float32   # float32 | float16 | bfloat16 — neural network dtype
+latent_dim: 4
+
+encoder:
+  encoder_type: linear             # gru | linear
+  linear_hidden_dims: [128, 128]   # per-step MLP depth (replaces GRU recurrence)
+  state_embed_dim: 10     #
+  action_embed_dim: 5     #
+  reward_embed_dim: 5     #
+  activation: tanh        # relu | tanh | gelu | elu | silu
+  normalize: none         # none | layer_norm | instance_norm
+
+decoder:
+  hidden_dims: [128, 64, 32]  # MLP hidden layer widths (any depth)
+  activation: tanh            # relu | tanh | gelu | elu | silu
+  normalize: none             # none | layer_norm | instance_norm
+
+policy:
+  hidden_dims: [128, 64, 32]  # MLP hidden layer widths (any depth)
+  activation: tanh            # tanh keeps actions bounded before squashing
+  normalize: none             # none | layer_norm | instance_norm

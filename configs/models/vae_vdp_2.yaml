@@ -1,0 +1,24 @@
+# Matched Van der Pol GRU latency sweep: 128 -> 96 -> 64 -> 32 hidden units.
+# All variants retain float32, tanh, no normalization, fixed input embeddings,
+# and the same decoder; only inference-time encoder and actor capacity changes.
+model_precision: float32   # float32 | float16 | bfloat16 — neural network dtype
+latent_dim: 4
+
+encoder:
+  encoder_type: gru
+  hidden_size: 96           # GRU hidden state dimension
+  state_embed_dim: 10       #
+  action_embed_dim: 5      #
+  reward_embed_dim: 5      #
+  activation: tanh          # relu | tanh | gelu | elu | silu
+  normalize: none    # none | layer_norm | instance_norm
+
+decoder:
+  hidden_dims: [128, 64, 32]  # MLP hidden layer widths (any depth)
+  activation: tanh            # relu | tanh | gelu | elu | silu
+  normalize: none    # none | layer_norm | instance_norm
+
+policy:
+  hidden_dims: [96, 48, 24]  # MLP hidden layer widths (any depth)
+  activation: tanh            # tanh keeps actions bounded before squashing
+  normalize: none    # none | layer_norm | instance_norm

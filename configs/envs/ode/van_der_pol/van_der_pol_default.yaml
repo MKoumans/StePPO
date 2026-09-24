@@ -1,0 +1,40 @@
+# Van der Pol VariBAD — full meta-learning configuration.
+# Hidden task: mu (stiffness), sampled log-uniformly from [mu_min, mu_max].
+# mu is NOT in the observation — VariBAD must infer it from the trajectory.
+extends: ode_default
+model: vae_vdp_3
+
+exp_name: "van_der_pol_default"
+
+rollout_steps: 750  #
+eval_max_steps: 750 #
+
+ppo:
+  entropy_coeff: 0.005
+  target_kl: 0.02
+
+env:
+  system: van_der_pol
+  precision: float64
+  t_end: 50
+  dt0: 1.0e-3
+  rtol: 1.0e-3
+  atol: 1.0e-6
+  dt_min: 1.0e-6
+  dt_max: 5.0
+  dt_log_gain: 2.5        # dt_next = clip(dt * exp(action * dt_log_gain), dt_min, dt_max), action in [-1,1] -> max exp(2.5) ~= 12.2x per step
+  immediate_dt_action: true  #
+  progress_warp: false
+  survival_penalty: 0.0
+  margin_penalty: 0.0     # explicit; was falling through to the ODEEnvConfig default
+  mu_min: 1.0
+  mu_max: 100.0
+  sample_mu: true # false | true
+  sample_y0: false # false | true # true can easily be achieved, but for consistency with DeepONet, do not do this.
+  y0_x: 0.0
+  y0_y: -2.0 #
+  obs_features: [state, step_context] # see experiment: outputs/experiments/20260824/57cde7c4
+  task_sample_scheme: "log-binned"
+  train_bins: [[5.0, 15.0], [35.0,45.0]] # [[1.0, 50.0]] # [[5.0, 15.0], [35.0,45.0]] # [[1.0, 50.0]]  # full range for the final comparison
+  val_bins: [[1.0, 50.0]]    # full validation range
+  test_bins: [[1.0, 50.0]]   # full test range

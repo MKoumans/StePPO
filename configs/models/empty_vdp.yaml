@@ -1,0 +1,24 @@
+# Policy only architecture for Van der Pol oscillator.
+# Controls network depth, width, activation, and normalization.
+# Referenced by van_der_pol_default.yaml (embed in vae: and ppo.policy: sections).
+model_precision: float32   # float32 | float16 | bfloat16 — neural network dtype
+latent_dim: 1 # zero space
+
+encoder:
+  hidden_size: 1          # GRU hidden state dimension
+  encoder_type: zero      # zero | gru | linear
+  state_embed_dim: 1      #
+  action_embed_dim: 1     #
+  reward_embed_dim: 1     #
+  activation: tanh        # relu | tanh | gelu | elu | silu
+  normalize: none         # none | layer_norm | instance_norm
+
+decoder:
+  hidden_dims: [4]    # MLP hidden layer widths (any depth)
+  activation: tanh    # relu | tanh | gelu | elu | silu
+  normalize: none     # none | layer_norm | instance_norm
+
+policy:
+  hidden_dims: [128, 64, 32]  # MLP hidden layer widths (any depth)
+  activation: tanh            # tanh keeps actions bounded before squashing
+  normalize: none             # none | layer_norm | instance_norm

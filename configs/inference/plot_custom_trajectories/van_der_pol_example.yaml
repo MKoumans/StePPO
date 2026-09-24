@@ -1,0 +1,8 @@
+# Task + explicit y0 conditions (2-D system, y0 override supported).
+checkpoint: outputs/runs/<date>/ode/van_der_pol/<run_uid>/checkpoints/checkpoint_500
+conditions:
+  - [5, [0.0, 0.0]]
+  - [50, [2.0, 2.0]]
+  - [100, [-2.0, -2.0]]
+step_interval: 5
+show_rejected: true

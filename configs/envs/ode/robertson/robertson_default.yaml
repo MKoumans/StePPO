@@ -1,0 +1,36 @@
+# Robertson chemical kinetics — canonical stiff test problem.
+# Hidden task: k2 (fast reaction rate), sampled log-uniformly from [k2_min, k2_max].
+# Extreme stiffness ratios (k2/k1 ~ 10^6–10^10) — tests step-size control across
+# fast transient (tiny dt) → slow evolution (large dt).
+extends: ode_default
+model: vae_vdp_linear
+
+exp_name: "robertson_default"
+
+rollout_steps: 1000
+eval_max_steps: 1000
+
+env:
+  system: robertson
+  precision: float64
+  t_end: 100000
+  dt0: 1.0e-2
+  rtol: 1.0e-3
+  atol: 1.0e-6
+  dt_min: 1.0e-10
+  dt_max: 1.0e+5
+  dt_log_gain: 2.5
+  immediate_dt_action: true #
+  progress_warp: true       #
+  survival_penalty: 0.0     # 0.25 (chemical_cascade-tuned) swamps reward at 1000 steps; see memory
+  k2_min: 1.0e+5
+  k2_max: 1.0e+9
+  sample_k2: true
+  sample_y0: false
+  y0_x: 1.0
+  y0_y: 0.0
+  obs_features: [state, step_context] # see experiment: outputs/experiments/20260824/57cde7c4
+  task_sample_scheme: "log-binned"
+  train_bins: [[1.0e+5, 1.0e+9]]  # full range for now
+  val_bins: [[1.0e+5, 1.0e+9]]    # swept periodically during training (eval_metrics)
+  test_bins: [[1.0e+5, 1.0e+9]]   # swept periodically during training and by post-hoc analysis scripts

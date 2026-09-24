@@ -1,0 +1,11 @@
+# Batch-size sweep + AUC integration for a Van der Pol checkpoint.
+# Fill in `checkpoint` with a real checkpoint_N path before running:
+#   uv run python research/ode/diagnostics/wallclock_batch_size_sweep.py \
+#       --config configs/diagnostics/wallclock_batch_size_sweep/van_der_pol.yaml
+system: van_der_pol
+checkpoint: outputs/runs/<date>/ode/van_der_pol/<run_uid>/checkpoints/checkpoint_500
+repeats: 3
+n_sweep: 30
+max_steps: 8192
+device: gpu
+reuse: false

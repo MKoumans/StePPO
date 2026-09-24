@@ -1,0 +1,36 @@
+# FitzHugh-Nagumo — simplified neuron model with tunable time-scale separation.
+# Hidden task: eps (time-scale separation), sampled log-uniformly from [eps_min, eps_max].
+# Small eps → stiff relaxation oscillations; large eps → mild oscillations.
+extends: ode_default
+model: vae_vdp_linear
+
+exp_name: "fitzhugh_nagumo_default"
+
+rollout_steps: 800      #
+eval_max_steps: 800     # must exceed PID baseline at hardest mu (713 steps at eps=0.2)
+
+env:
+  system: fitzhugh_nagumo
+  precision: float64
+  t_end: 50
+  dt0: 1.0e-4
+  rtol: 1.0e-3
+  atol: 1.0e-6
+  dt_min: 1.0e-4
+  dt_max: 5.0
+  dt_log_gain: 2.5
+  progress_warp: true
+  immediate_dt_action: true
+  survival_penalty: 0.0
+  eps_min: 0.005
+  eps_max: 1.0
+  sample_eps: true
+  pulse_config: pulse_config
+  sample_y0: false
+  y0_x: -1.0
+  y0_y: 1.0
+  obs_features: [state, step_context] # see experiment: outputs/experiments/20260824/57cde7c4
+  task_sample_scheme: "log-binned"
+  train_bins: [[0.005, 1.0]]  # full range for now
+  val_bins: [[0.005, 1.0]]    # swept periodically during training (eval_metrics)
+  test_bins: [[0.005, 1.0]]   # swept periodically during training and by post-hoc analysis scripts

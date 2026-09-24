@@ -1,0 +1,19 @@
+# GPU container for the DeepONet baselines (research/baselines/deeponet/).
+# Separate from docker/Dockerfile because torch-cuda and jax[cuda12] require
+# conflicting nvidia-cudnn-cu12 versions.
+FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV DDE_BACKEND=pytorch
+
+RUN pip install --no-cache-dir \
+    deepxde \
+    torchdiffeq \
+    scipy \
+    numpy \
+    matplotlib \
+    pyyaml \
+    huggingface_hub
+
+WORKDIR /workspace
