@@ -48,7 +48,7 @@ needs CUDA 12 on Linux.
 
 ```bash
 uv sync
-uv sync --extra logging   # optional: adds Weights & Biases
+# uv sync --extra logging   # optional: adds Weights & Biases
 ```
 
 Run commands with `uv run` (as below), or activate the environment with
@@ -123,9 +123,11 @@ An episode is one adaptive ODE solve. The agent emits a scalar
 the environment runs an implicit Kvaerno5 step and returns local error and
 accept/reject feedback. The hidden task parameter is never observed.
 
-Ten ODE systems are registered — `scalar_decay`, `van_der_pol`, `robertson`,
+<!-- Ten ODE systems are registered — `scalar_decay`, `van_der_pol`, `robertson`,
 `brusselator`, `fitzhugh_nagumo`, `chemical_cascade`, `fosm`, `fosm_smooth`,
-`chua`, `chua_smooth` — each a single file plus a registry entry.
+`chua`, `chua_smooth` — each a single file plus a registry entry. Three systems
+are used in the paper: `scalar_decay`, `van_der_pol` and `brusselator`.  -->
+Three systems are used in the paper: `scalar_decay`, `van_der_pol` and `brusselator`.
 
 A trained agent can be deployed as a diffrax
 `AbstractAdaptiveStepSizeController`, running inside `diffeqsolve`'s fused XLA
@@ -157,14 +159,13 @@ src/steppo/          # Library
 
 research/ode/     # Experiment entrypoints, analysis, baselines, inference
 research/baselines/deeponet/  # DeepONet baseline (separate PyTorch container)
-research/pid_tuning/          # Bayesian optimisation of PI gains
 configs/          # envs/ (per-system YAML) + models/ (architecture YAML)
 scripts/          # Launchers, batch orchestration, dataset generation
 tests/            # pytest suite
 docs/             # This documentation
 ```
 
-## Citation
+<!-- ## Citation
 
 ```bibtex
 @inproceedings{koumans2027steppo,
@@ -175,7 +176,7 @@ docs/             # This documentation
                Processing (ICASSP)},
   year      = {2027}
 }
-```
+``` -->
 
 ## References
 
