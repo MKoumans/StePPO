@@ -17,12 +17,17 @@ This page covers three things:
 3. [Figures from scratch](#figures-from-scratch-execute) (`--mode execute`):
    generate the datasets, train every model yourself, then plot.
 
+[`paper/run.sh`](paper/run.sh) runs route 2 or 3 end to end
+([All figures in one command](#all-figures-in-one-command)).
+
 ## Setup
 
+Route 2 runs on a CPU; route 3 needs a Linux machine with an NVIDIA GPU.
 Install as in the [README](README.md#installation), or use the CUDA 12
 container:
 
 ```bash
+git clone https://github.com/MKoumans/StePPO.git && cd StePPO
 docker compose -f docker/docker-compose.yml up -d
 docker compose -f docker/docker-compose.yml exec app bash
 ```
@@ -98,10 +103,26 @@ times depend on the hardware.
 
 ## Figures from scratch (execute)
 
-Every figure script also takes `--mode execute`, which loads models trained
-here instead of the released ones. Train them first.
+This route rebuilds everything the previous one downloads: the datasets, the
+StePPO models and the DeepONets. Every figure script also takes
+`--mode execute`, which loads the models trained here instead of the released
+ones.
 
-**StePPO (JAX container), per system, several hours each:**
+### 1. Generate the datasets (JAX container)
+
+```bash
+for system in scalar_decay van_der_pol brusselator; do
+  bash paper/train.sh $system --data-only --gpus 0
+done
+```
+
+This solves the tasks of each system's `*_icassp2027` config with PID, the
+Oracle and a tight-tolerance reference, and writes the PID training caches and
+the test-split evaluation datasets to `data/<system>/`. These are the files
+`download_data.py` fetches. The generation is deterministic, so the files
+match the published ones.
+
+### 2. Train StePPO (JAX container), several hours per system
 
 ```bash
 nohup bash paper/train.sh scalar_decay --gpus 0 > train_sd.log 2>&1 &
@@ -109,12 +130,11 @@ nohup bash paper/train.sh van_der_pol --gpus 1 > train_vdp.log 2>&1 &
 nohup bash paper/train.sh brusselator --gpus 2 > train_bru.log 2>&1 &
 ```
 
-`train.sh` generates the PID and Oracle datasets of the system's
-`*_icassp2027` config, the same files `download_data.py` fetches, then trains
-StePPO into `outputs/paper/models/<system>/`. Extra arguments go to
-`research/ode/run.py`, e.g. `--seed 1`.
+`train.sh` first runs step 1 for its system, reusing the datasets if they
+already exist. It then trains StePPO into `outputs/paper/models/<system>/`.
+Extra arguments go to `research/ode/run.py`, e.g. `--seed 1`.
 
-**DeepONet (DeepONet container):**
+### 3. Train the DeepONets (DeepONet container)
 
 ```bash
 docker compose -f docker/docker-compose.deeponet.yml exec deeponet bash
@@ -126,12 +146,27 @@ PYTHONPATH=. python research/baselines/deeponet/train_deeponet_unified.py --prof
 
 The checkpoints land in `research/baselines/deeponet/output-deeponet/<system>/models/`.
 
-**Figures:** the commands of the previous section with `--mode execute`,
-including `fig5_deeponet_timing.py --mode execute`. A script whose model is
-missing stops and prints the command that trains it.
+### 4. Plot
+
+Run the commands of the [previous section](#figures-from-the-released-models-import)
+with `--mode execute`, including `fig5_deeponet_timing.py --mode execute`,
+and skip `download_data.py`. A script whose model is missing stops and prints
+the command that trains it.
 
 Retrained models reproduce the figures statistically, not exactly: GPU
 training is not bit-reproducible.
 
-The datasets themselves are deterministic: regenerating them gives the
-published files.
+## All figures in one command
+
+[`paper/run.sh`](paper/run.sh) chains the steps above:
+
+```bash
+bash paper/run.sh                  # import: download the datasets, plot Figs. 2–5 from the released models
+bash paper/run.sh --mode execute   # execute: generate the datasets, train StePPO and DeepONet, then plot
+```
+
+It needs the StePPO environment on `PATH` and the DeepONet (PyTorch)
+environment at `$DEEPONET_PYTHON` (default `/opt/deeponet/bin/python`). Without
+the latter, import mode plots Fig. 5 without DeepONet and execute mode stops.
+`--gpus N` selects the GPU, and `--results DIR` copies the figures and CSVs
+(and in execute mode the trained models) to `DIR`.
