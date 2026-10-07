@@ -174,7 +174,7 @@ device_detach() {
     shift
     mkdir -p "$(dirname "${log_file}")"
     echo "[*] Detaching from this terminal so the run survives it closing."
-    echo "[*] Follow progress with: tail -f ${log_file}"
+    echo "[*] Follow progress with: tail -f ${log_file#"$PWD"/}"
     setsid nohup "$0" "$@" </dev/null >"${log_file}" 2>&1 &
     disown
     echo "[*] Detached (PID $!)."

@@ -53,7 +53,7 @@ if device_have_sbatch && ! device_on_slurm; then
     mkdir -p "${LOG_DIR}"
     JOB_ID=$(cd "${REPO_ROOT}" && sbatch --parsable --output="${LOG_DIR}/%x_%j.out" "${BASH_SOURCE[0]}" "${SELF_SUBMIT_ARGS[@]}")
     echo "[+] Submitted as Slurm job ${JOB_ID}"
-    echo "    Follow with: tail -f ${LOG_DIR}/ode-average-seeds_${JOB_ID}.out"
+    echo "    Follow with: tail -f ${LOG_DIR#"$PWD"/}/ode-average-seeds_${JOB_ID}.out"
     exit 0
 fi
 

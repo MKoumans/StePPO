@@ -132,7 +132,7 @@ if [ "$ON_HPC" -eq 1 ] && ! device_on_slurm; then
         --output="${LAUNCH_LOG_DIR}/${SYSTEM}_%j.out" \
         "${WORKDIR}/scripts/launch_experiments.sh" "${ARGS[@]}")
     echo "[*] On an HPC login node with no active Slurm job; resubmitting this launcher as Slurm job ${JOB_ID} (partition=gpu_mig) so Apptainer runs on a compute node."
-    echo "[*] Follow with: tail -f ${LAUNCH_LOG_DIR}/${SYSTEM}_${JOB_ID}.out"
+    echo "[*] Follow with: tail -f ${LAUNCH_LOG_DIR#"$PWD"/}/${SYSTEM}_${JOB_ID}.out"
     exit 0
 fi
 
@@ -199,8 +199,8 @@ mkdir -p "$LOG_DIR"
 mkdir -p "$CONFIG_DIR"
 
 echo "[*] Experiment UID: ${EXPERIMENT_UID}"
-echo "[*] Checkpoints -> ${CHECKPOINTS_DIR}"
-echo "[*] Outputs     -> ${OUTPUTS_DIR}"
+echo "[*] Checkpoints -> ${CHECKPOINTS_DIR#"$PWD"/}"
+echo "[*] Outputs     -> ${OUTPUTS_DIR#"$PWD"/}"
 
 if [ -n "$NOTES" ]; then
     if [ -f "$NOTES" ]; then
@@ -208,13 +208,13 @@ if [ -n "$NOTES" ]; then
     else
         echo "$NOTES" > "${EXPERIMENT_DIR}/notes.txt"
     fi
-    echo "[*] Notes       -> ${EXPERIMENT_DIR}/notes.txt"
+    echo "[*] Notes       -> ${EXPERIMENT_DIR#"$PWD"/}/notes.txt"
 fi
 
 if [ -n "$BASE_CONFIG" ]; then
     CONFIG_DIR="${EXPERIMENT_DIR}/configs"
     echo "[*] Generating experiment configs from ${BASE_CONFIG} + ${SWEEP_SPEC}"
-    echo "[*] Configs     -> ${CONFIG_DIR}"
+    echo "[*] Configs     -> ${CONFIG_DIR#"$PWD"/}"
     run_py research/ode/generate_experiments.py \
         --base "${BASE_CONFIG}" \
         --sweep "${SWEEP_SPEC}" \
@@ -269,7 +269,7 @@ if [ "$MISSING" -gt 0 ] && [ "$GENERATE_DATASETS" = "true" ]; then
                 --export=ALL,CONFIG="${CFG_PATH}" \
                 "${WORKDIR}/scripts/generate-pid-dataset.sh")
             DATASET_JOB_ID["${CFG}"]="${JOB_ID}"
-            echo "[+] Submitted dataset generation for ${CFG} as Slurm job ${JOB_ID} -> ${DS_LOG}"
+            echo "[+] Submitted dataset generation for ${CFG} as Slurm job ${JOB_ID} -> ${DS_LOG#"$PWD"/}"
         done
         echo ""
         echo "[*] Training jobs for these configs will wait on their dataset job to finish (Slurm --dependency=afterok)."
@@ -355,14 +355,14 @@ if [ "$ON_HPC" -eq 1 ]; then
             "${WORKDIR}/scripts/run.sh" \
             "${RUN_ARGS[@]}")
         JOB_IDS+=("$JOB_ID")
-        echo "[+] Submitted ${PREFIX}_${EID} as Slurm job ${JOB_ID}${DS_JOB:+ (after dataset job ${DS_JOB})} -> ${LOG}"
+        echo "[+] Submitted ${PREFIX}_${EID} as Slurm job ${JOB_ID}${DS_JOB:+ (after dataset job ${DS_JOB})} -> ${LOG#"$PWD"/}"
     done
 
     echo ""
     echo "All experiments submitted as Slurm jobs: ${JOB_IDS[*]}"
     echo ""
     echo "  squeue -u \$USER                            # job status"
-    echo "  tail -f ${LOG_DIR}/${PREFIX}_${TASK_EIDS[0]}.log      # follow one experiment"
+    echo "  tail -f ${LOG_DIR#"$PWD"/}/${PREFIX}_${TASK_EIDS[0]}.log      # follow one experiment"
     echo "  scancel ${JOB_IDS[*]}    # cancel all"
 
     if [ "$POST_RUN_ANALYSIS" = "true" ]; then
@@ -379,7 +379,7 @@ if [ "$ON_HPC" -eq 1 ]; then
             "${WORKDIR}/scripts/ode-experiment-analysis.sh" \
             --experiment_uid "${EXPERIMENT_UID}" --experiment_date "${EXPERIMENT_DATE}")
         echo ""
-        echo "[+] Post-run analysis submitted as Slurm job ${ANALYSIS_JOB_ID} (after: ${JOB_IDS[*]}, time limit ${ANALYSIS_TIME}) -> ${ANALYSIS_LOG}"
+        echo "[+] Post-run analysis submitted as Slurm job ${ANALYSIS_JOB_ID} (after: ${JOB_IDS[*]}, time limit ${ANALYSIS_TIME}) -> ${ANALYSIS_LOG#"$PWD"/}"
     fi
 
     print_analysis_hint
@@ -414,7 +414,7 @@ for g in "${!GPUS[@]}"; do
             EID="${TASK_EIDS[$TI]}"
             SEED="${TASK_SEEDS[$TI]}"
             LOG="${LOG_DIR}/${PREFIX}_${EID}.log"
-            echo "[+] GPU ${GPU}: running ${PREFIX}_${EID} -> ${LOG}"
+            echo "[+] GPU ${GPU}: running ${PREFIX}_${EID} -> ${LOG#"$PWD"/}"
             CODE=0
             RUN_ARGS=(--config "${CONFIG_DIR}/${CFG}" --checkpoints_dir "${CHECKPOINTS_DIR}" --outputs_dir "${OUTPUTS_DIR}")
             [ -n "$SEED" ] && RUN_ARGS+=(--seed "$SEED")
@@ -439,8 +439,8 @@ done
 echo ""
 echo "All chunks running in background."
 echo ""
-echo "  tail -f ${LOG_DIR}/${PREFIX}_${TASK_EIDS[0]}.log      # follow one experiment"
-echo "  tail -f ${LOG_DIR}/${PREFIX}_e*.log       # follow all"
+echo "  tail -f ${LOG_DIR#"$PWD"/}/${PREFIX}_${TASK_EIDS[0]}.log      # follow one experiment"
+echo "  tail -f ${LOG_DIR#"$PWD"/}/${PREFIX}_e*.log       # follow all"
 echo ""
 echo "PIDs (one per GPU chunk): ${PIDS[*]}"
 echo ""
@@ -456,7 +456,7 @@ echo ""
 if [ "$FAILED" -eq 0 ]; then
     echo "[+] All GPU chunks completed successfully."
 else
-    echo "[-] ${FAILED}/${NUM_GPUS} GPU chunk(s) had at least one failed experiment. Check logs in ${LOG_DIR}/"
+    echo "[-] ${FAILED}/${NUM_GPUS} GPU chunk(s) had at least one failed experiment. Check logs in ${LOG_DIR#"$PWD"/}/"
 fi
 
 if [ "$POST_RUN_ANALYSIS" = "true" ]; then

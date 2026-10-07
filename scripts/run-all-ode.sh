@@ -140,7 +140,7 @@ if [ "${HAVE_SBATCH}" -eq 1 ] && ! device_on_slurm; then
         --output="${LAUNCH_LOG_DIR}/%j.out" \
         "${REPO_ROOT}/scripts/run-all-ode.sh" "${ORIGINAL_ARGS[@]}")
     echo "[*] On an HPC login node with no active Slurm job; resubmitting this launcher as Slurm job ${JOB_ID} (partition=gpu_mig) so Apptainer runs on a compute node."
-    echo "[*] Follow with: tail -f ${LAUNCH_LOG_DIR}/${JOB_ID}.out"
+    echo "[*] Follow with: tail -f ${LAUNCH_LOG_DIR#"$PWD"/}/${JOB_ID}.out"
     exit 0
 fi
 
@@ -259,7 +259,7 @@ for SYSTEM in "${SYSTEMS[@]}"; do
                 --output="${RUN_LOG_DIR}/%x_%j.out" \
                 --export="ALL,CONFIG=${CONFIG},RUN_UID=${RUN_UID},RUN_DATE=${RUN_DATE}${SYSTEM_GPU:+,CUDA_VISIBLE_DEVICES=${SYSTEM_GPU}}" \
                 scripts/run.sh "${RUN_ARGS[@]}")
-            echo "[+] Submitted ${JOB_NAME} as Slurm job ${JOB_ID} (run dir: ${RUN_DIR})"
+            echo "[+] Submitted ${JOB_NAME} as Slurm job ${JOB_ID} (run dir: ${RUN_DIR#"$PWD"/})"
             if [ "${POST_RUN_ANALYSIS}" = "true" ]; then
                 ANALYSIS_LOG_DIR="${REPO_ROOT}/outputs/logs/post-run-analysis/${RUN_DATE}"
                 mkdir -p "${ANALYSIS_LOG_DIR}"
@@ -286,21 +286,21 @@ for SYSTEM in "${SYSTEMS[@]}"; do
         RUN_LOG_DIR="${REPO_ROOT}/outputs/logs/run/${RUN_DATE}"
         RUN_LOG="${RUN_LOG_DIR}/ode_${JOB_NAME}_${RUN_UID}.log"
         mkdir -p "${RUN_LOG_DIR}"
-        echo "[+] Running ${JOB_NAME} (${CONFIG})${SYSTEM_GPU:+, GPU=${SYSTEM_GPU}} - log: ${RUN_LOG}"
+        echo "[+] Running ${JOB_NAME} (${CONFIG})${SYSTEM_GPU:+, GPU=${SYSTEM_GPU}} - log: ${RUN_LOG#"$PWD"/}"
         (
             CODE=0
             CONFIG="${CONFIG}" RUN_UID="${RUN_UID}" RUN_DATE="${RUN_DATE}" _LAUNCH_DETACHED=1 \
                 device_run_with_gpu "${SYSTEM_GPU}" bash scripts/run.sh "${RUN_ARGS[@]}" >"${RUN_LOG}" 2>&1 || CODE=$?
             if [ "$CODE" -ne 0 ]; then
-                echo "[-] ${JOB_NAME} failed with exit code ${CODE} (see ${RUN_LOG})"
+                echo "[-] ${JOB_NAME} failed with exit code ${CODE} (see ${RUN_LOG#"$PWD"/})"
                 exit "$CODE"
             fi
             if [ "${POST_RUN_ANALYSIS}" = "true" ]; then
                 ANALYSIS_LOG="${RUN_LOG_DIR}/ode_${JOB_NAME}_${RUN_UID}_analysis.log"
-                echo "[+] Running post-run analysis for ${JOB_NAME} -> ${ANALYSIS_LOG}"
+                echo "[+] Running post-run analysis for ${JOB_NAME} -> ${ANALYSIS_LOG#"$PWD"/}"
                 CUDA_VISIBLE_DEVICES="${SYSTEM_GPU:-0}" \
                     bash scripts/ode-post-run-analysis.sh --run-dir "${RUN_DIR}" >"${ANALYSIS_LOG}" 2>&1 \
-                    || echo "[-] Post-run analysis for ${JOB_NAME} failed (see ${ANALYSIS_LOG})"
+                    || echo "[-] Post-run analysis for ${JOB_NAME} failed (see ${ANALYSIS_LOG#"$PWD"/})"
             fi
         ) &
         SLOT_PID[${SLOT_KEY}]=$!
@@ -329,14 +329,14 @@ for SYSTEM in "${SYSTEMS[@]}"; do
             AVG_LOG_DIR="${REPO_ROOT}/outputs/logs/run/${SYSTEM_RUN_DATE}"
             AVG_LOG="${AVG_LOG_DIR}/ode_${SYSTEM}_seed_average.log"
             mkdir -p "${AVG_LOG_DIR}"
-            echo "[+] Will average ${SYSTEM}'s ${REPEAT} seeds once its jobs finish - log: ${AVG_LOG}"
+            echo "[+] Will average ${SYSTEM}'s ${REPEAT} seeds once its jobs finish - log: ${AVG_LOG#"$PWD"/}"
             (
                 for PID in "${SYSTEM_PIDS[@]}"; do
                     while kill -0 "${PID}" 2>/dev/null; do sleep 2; done
                 done
                 bash scripts/ode-average-seeds.sh --runs "${SEED_AVG_RUN_ARGS[@]}" --out "${SEED_AVG_OUT}" \
                     >"${AVG_LOG}" 2>&1 \
-                    || echo "[-] Seed-averaging for ${SYSTEM} failed (see ${AVG_LOG})"
+                    || echo "[-] Seed-averaging for ${SYSTEM} failed (see ${AVG_LOG#"$PWD"/})"
             ) &
             AVG_PIDS+=("$!")
         fi

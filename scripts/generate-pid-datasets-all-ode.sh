@@ -130,13 +130,13 @@ for SYSTEM in "${SYSTEMS[@]}"; do
     RUN_LOG_DIR="${REPO_ROOT}/outputs/logs/generate-pid-dataset/${RUN_DATE}"
     RUN_LOG="${RUN_LOG_DIR}/${JOB_NAME}.log"
     mkdir -p "${RUN_LOG_DIR}"
-    echo "[+] Running ${JOB_NAME} (${CONFIG})${SYSTEM_GPU:+, GPU=${SYSTEM_GPU}} - log: ${RUN_LOG}"
+    echo "[+] Running ${JOB_NAME} (${CONFIG})${SYSTEM_GPU:+, GPU=${SYSTEM_GPU}} - log: ${RUN_LOG#"$PWD"/}"
     (
         CODE=0
         CONFIG="${CONFIG}" FORCE="${FORCE}" _LAUNCH_DETACHED=1 \
             device_run_with_gpu "${SYSTEM_GPU}" bash scripts/generate-pid-dataset.sh >"${RUN_LOG}" 2>&1 || CODE=$?
         if [ "$CODE" -ne 0 ]; then
-            echo "[-] ${JOB_NAME} failed with exit code ${CODE} (see ${RUN_LOG})"
+            echo "[-] ${JOB_NAME} failed with exit code ${CODE} (see ${RUN_LOG#"$PWD"/})"
             exit "$CODE"
         fi
     ) &

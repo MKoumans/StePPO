@@ -83,7 +83,7 @@ if device_have_sbatch && ! device_on_slurm; then
     mkdir -p "${LOG_DIR}"
     JOB_ID=$(cd "${REPO_ROOT}" && sbatch --parsable --output="${LOG_DIR}/%x_%j.out" "${BASH_SOURCE[0]}" "${ORIG_ARGS[@]}")
     echo "[+] Submitted as Slurm job ${JOB_ID}"
-    echo "    Follow with: tail -f ${LOG_DIR}/ode-post-run-analysis_${JOB_ID}.out"
+    echo "    Follow with: tail -f ${LOG_DIR#"$PWD"/}/ode-post-run-analysis_${JOB_ID}.out"
     exit 0
 fi
 
@@ -139,7 +139,7 @@ fi
 echo "[*] Checkpoint : ${CHECKPOINT:-<none>}"
 echo "[*] Config     : ${CONFIG:-<auto-detect from checkpoint>}"
 echo "[*] Run ID     : ${RUN_ID}"
-echo "[*] Output dir : ${OUT_DIR}"
+echo "[*] Output dir : ${OUT_DIR#"$PWD"/}"
 
 FAILED=0
 
@@ -164,8 +164,8 @@ device_run_py research/ode/post_run_analysis/z_sensitivity.py "${CONFIG_ARGS[@]}
     || { echo "[!] z_sensitivity.py failed, continuing"; FAILED=1; }
 
 if [ "$FAILED" -eq 0 ]; then
-    echo "[+] All experiment outputs saved to: ${OUT_DIR}"
+    echo "[+] All experiment outputs saved to: ${OUT_DIR#"$PWD"/}"
 else
-    echo "[-] Some analysis steps failed; partial outputs saved to: ${OUT_DIR}"
+    echo "[-] Some analysis steps failed; partial outputs saved to: ${OUT_DIR#"$PWD"/}"
 fi
 exit "$FAILED"
