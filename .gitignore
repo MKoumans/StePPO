@@ -72,3 +72,4 @@ docs/paper/
 # Local model checkpoints (distributed via Hugging Face)
 /models/
 research/baselines/deeponet/output-deeponet/
+development
