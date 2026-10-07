@@ -210,6 +210,16 @@ Podman override yet, so under Podman it runs without the GPU; use
   `docker-compose.podman.yml` override, re-run `steppo setup-gpu` (needed after
   driver updates), and check that `podman machine ssh "nvidia-ctk cdi list"`
   lists `nvidia.com/gpu=all`.
+- **`unresolvable CDI devices nvidia.com/gpu=all` on `up`.** The CDI spec does
+  not exist yet (`nvidia-ctk: command not found` in the machine means the
+  toolkit is missing too). Run `steppo setup-gpu`, or the manual steps in
+  [One-time Podman setup](#one-time-podman-setup), then restart the machine
+  (`podman machine stop; podman machine start`). If `nvidia-smi` is also
+  missing in the machine, update the Windows NVIDIA driver and run
+  `wsl --update`.
+- **`ModuleNotFoundError: No module named 'steppo'` from `scripts/run.sh`.** The
+  image installs only the dependencies, not the project. Run `uv sync --frozen`
+  once in the container.
 - **`http://127.0.0.1:8888` does not load under Podman.** Use the link
   `steppo jupyter` prints, which points at the Podman VM's address.
 - **`CUDA_ERROR_OUT_OF_MEMORY` lines on a laptop GPU.** XLA retries smaller

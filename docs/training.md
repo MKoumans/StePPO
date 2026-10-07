@@ -23,6 +23,14 @@ scripts/running.sh                                 # inspect running runs
 scripts/stop_experiments.sh                        # stop them
 ```
 
+## Running in the Docker container
+
+Set up the container as described in [installation.md](installation.md), then run
+`uv sync --frozen` once inside it (the image does not install `steppo` itself).
+`scripts/run.sh` detaches and logs to `outputs/logs/run/<date>/<run>.log`; if that
+log shows `cuInit(0) failed`, the container has no GPU, see
+[Troubleshooting](installation.md#troubleshooting).
+
 ## The loop
 
 Each iteration:
