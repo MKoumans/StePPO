@@ -7,7 +7,7 @@ Milan Koumans¹, Nicola Pezzotti² and Tristan S.W. Stevens¹
 ¹ Signal Processing Systems, Eindhoven University of Technology, Eindhoven<br>
 ² SCAN, ASML, Veldhoven
 
-[![Paper](https://img.shields.io/badge/paper-ICASSP%202027-b31b1b.svg)](#citation)
+<!-- [![Paper](https://img.shields.io/badge/paper-ICASSP%202027-b31b1b.svg)](#citation) -->
 [![JAX](https://img.shields.io/badge/JAX-Flax%20NNX-blue.svg)](https://github.com/jax-ml/jax)
 
 Reference implementation for the paper, in JAX/Flax NNX.
